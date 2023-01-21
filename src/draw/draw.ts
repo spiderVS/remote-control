@@ -1,30 +1,44 @@
-import { mouse, Point } from '@nut-tree/nut-js';
+import { mouse, left, right, up, down, Point, straightTo, centerOf, Region } from '@nut-tree/nut-js';
 
-export const drawHandler = async (command: string, arg1: number, arg2?: number) => {
-  switch (command) {
-    case 'draw_circle':
-      const { x: centerX, y: centerY } = await mouse.getPosition();
-      const pArr = getPointsArray(centerX, centerY, arg1);
-      const startPoint = pArr.shift()
-      mouse.config.mouseSpeed = 200;
-      await mouse.move([startPoint as Point]);
-      arg1 && (await mouse.drag(pArr));
-      break;
+export const drawHandler = async (command: string, arg1: number | null = null, arg2: number | null = null) => {
 
+  const center = await mouse.getPosition();
 
-    default:
-      break;
+  if (command === 'draw_circle' && arg1) {
+    mouse.config.mouseSpeed = 200;
+
+    const path = getCirclePointsArray(center, arg1);
+    const startPoint = path.shift();
+    await mouse.move([startPoint as Point]);
+    await mouse.drag(path);
+    await mouse.move([center]);
+
+  } else if (command === 'draw_rectangle' && arg1 && arg2) {
+    let { x, y } = center;
+    const path = [new Point(x = x + arg1, y), new Point(x, y = y + arg2), new Point(x = x - arg1, y), new Point(center.x, center.y)];
+    mouse.config.mouseSpeed = 200;
+
+    for (const point of path) {
+      await mouse.drag(straightTo(point));
+    }
+  }  else if (command === 'draw_square' && arg1) {
+    let { x, y } = center;
+    const path = [new Point(x = x + arg1, y), new Point(x, y = y + arg1), new Point(x = x - arg1, y), center];
+    mouse.config.mouseSpeed = 200;
+    for (const point of path) {
+      await mouse.drag(straightTo(point));
+    }
   }
 };
 
-const getPointsArray = (xCtr: number, yCtr: number, radius: number ) => {
+const getCirclePointsArray = ({ x, y }: Point, radius: number ) => {
   const array = [];
-  const n = 360;
+  const n = 180;
   for (let a = 0; a <= n ; a++) {
     array.push(
       new Point(
-        (Math.cos(2 * Math.PI * a / n) * radius + 0.5) + xCtr,
-        (Math.sin(2 * Math.PI * a / n) * radius + 0.5) + yCtr
+        (Math.cos(2 * Math.PI * a / n) * radius + 0.5) + x,
+        (Math.sin(2 * Math.PI * a / n) * radius + 0.5) + y
       )
     );
   }
