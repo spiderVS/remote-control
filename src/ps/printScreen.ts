@@ -37,10 +37,11 @@ const getRegion = async () => {
 export const psHandler = async () => {
   const selectedRegion = getRegion();
   const grabbedBGRimg = await screen.grabRegion(selectedRegion);
+  const { scaleX, scaleY } = grabbedBGRimg.pixelDensity;
   await screen.highlight(selectedRegion);
   const RGBimg = await(grabbedBGRimg).toRGB();
 
-  const jimp = new Jimp({ data: RGBimg.data, width: 200, height: 200 });
+  const jimp = new Jimp({ data: RGBimg.data, width: 200 * scaleX, height: 200 * scaleY });
 
   const pngBuffer = await jimp.getBufferAsync(Jimp.MIME_PNG);
   return pngBuffer.toString('base64');

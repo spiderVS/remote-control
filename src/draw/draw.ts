@@ -53,7 +53,7 @@ export const drawHandler = async (command: string, arg1: number | null = null, a
 
 const getCirclePointsArray = ({ x, y }: Point, radius: number ) => {
   const array = [];
-  const n = 90;
+  const n = 180;
   for (let a = 0; a <= n ; a++) {
     array.push(
       new Point(
