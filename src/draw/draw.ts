@@ -1,4 +1,5 @@
 import { mouse, left, right, up, down, Point, straightTo, centerOf, Region } from '@nut-tree/nut-js';
+import path from 'path';
 
 export const drawHandler = async (command: string, arg1: number | null = null, arg2: number | null = null) => {
 
@@ -16,24 +17,43 @@ export const drawHandler = async (command: string, arg1: number | null = null, a
   } else if (command === 'draw_rectangle' && arg1 && arg2) {
     let { x, y } = center;
     const path = [new Point(x = x + arg1, y), new Point(x, y = y + arg2), new Point(x = x - arg1, y), new Point(center.x, center.y)];
-    mouse.config.mouseSpeed = 200;
 
-    for (const point of path) {
-      await mouse.drag(straightTo(point));
-    }
+
+    /* --- var 1 - good work on Linux systems --- */
+    // mouse.config.mouseSpeed = 200;
+    // for (const point of path) {
+    //   await mouse.drag(await straightTo(point));
+    // }
+    /* --- var 1 END --- */
+
+
+    /* --- var 2 - good work on all systems --- */
+    mouse.config.mouseSpeed = 3;
+    await mouse.drag(path);
+    /* --- var 2 END --- */
+
   }  else if (command === 'draw_square' && arg1) {
     let { x, y } = center;
     const path = [new Point(x = x + arg1, y), new Point(x, y = y + arg1), new Point(x = x - arg1, y), center];
-    mouse.config.mouseSpeed = 200;
-    for (const point of path) {
-      await mouse.drag(straightTo(point));
-    }
+
+    /* --- var 1 - good work on Linux systems --- */
+    // mouse.config.mouseSpeed = 200;
+    // for (const point of path) {
+    //   await mouse.drag(await straightTo(point));
+    // }
+    /* --- var 1 END --- */
+
+
+    /* --- var 2 - good work on all systems --- */
+    mouse.config.mouseSpeed = 3;
+    await mouse.drag(path);
+    /* --- var 2 END --- */
   }
 };
 
 const getCirclePointsArray = ({ x, y }: Point, radius: number ) => {
   const array = [];
-  const n = 180;
+  const n = 90;
   for (let a = 0; a <= n ; a++) {
     array.push(
       new Point(
