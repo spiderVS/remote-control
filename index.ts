@@ -10,6 +10,11 @@ httpServer.listen(HTTP_PORT, () => {
   console.log(`Static HTTP Server: Listening on http://localhost:${HTTP_PORT}`);
 });
 
+httpServer.on('close', () => {
+  console.log('- HTTP Server has been closed successfully.\nExiting...');
+  process.exit(0);
+})
+
 // -------- WS Server --------- /
 
 dotenv.config();

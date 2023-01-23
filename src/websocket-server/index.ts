@@ -1,4 +1,4 @@
-import { createWebSocketStream, WebSocketServer } from "ws";
+import WebSocket, { createWebSocketStream, WebSocketServer } from "ws";
 import { runCommand } from "../cmd/commands";
 import { httpServer } from '../http_server/index';
 
@@ -12,14 +12,18 @@ export const startWsServer = ( port: number ) => {
   });
 
   wsServer.on('close', () => {
-    console.log('WebSocketServer has been closed successfully.\n');
+    console.log('- WebSocketServer has been closed successfully.');
     httpServer.close();
   });
+
+  let websocket: WebSocket | null = null;
 
   wsServer.on('connection', (ws) => {
 
     const duplex = createWebSocketStream(ws, { encoding: 'utf8', decodeStrings: false });
-    console.log(`WebSocket Server: Client connected\n`);
+    websocket = ws;
+
+    console.log(`WebSocket Server: Client connected`);
     duplex.write('Connected');
 
     duplex.on('readable', async () => {
@@ -45,17 +49,24 @@ export const startWsServer = ( port: number ) => {
       duplex.end();
     });
 
-    ws.on('close', (code, reason) => {
-      console.log('WebSocket has been closed sucessfully.');
+    ws.on('close', () => {
+      console.log('- WebSocket has been closed sucessfully.');
+      websocket = null;
       if (isSIGINT) {
         wsServer.close();
       }
     });
+  });
 
-    process.on('SIGINT', () => {
-      ws.close();
+  process.on('SIGINT', () => {
+    console.log('\n\nClosing active connections and exiting:');
+    if (websocket) {
+      websocket.close();
       isSIGINT = true;
-    });
+    } else {
+      wsServer.close();
+    }
+
   });
 
 };
