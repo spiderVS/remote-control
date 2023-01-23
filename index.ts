@@ -1,5 +1,6 @@
 import { httpServer } from './src/http_server/index';
-import { startWsServer } from './src/websocket-server/index'
+import { startWsServer } from './src/websocket-server/index';
+import dotenv from "dotenv";
 
 // -------- Static HTTP Server --------- /
 
@@ -11,6 +12,7 @@ httpServer.listen(HTTP_PORT, () => {
 
 // -------- WS Server --------- /
 
-const WS_PORT = 8080;
+dotenv.config();
+export const WS_PORT = process.env.PORT ? +process.env.PORT : 8080;
 
 startWsServer(WS_PORT);
